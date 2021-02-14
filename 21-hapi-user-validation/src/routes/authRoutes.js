@@ -1,8 +1,6 @@
 const BaseRoute = require('./base/baseRoute')
 const Joi = require('joi')
 const Boom = require('boom')
-
-// npm i jsonwebtoken
 const Jwt = require('jsonwebtoken')
 const PasswordHelper = require('./../helpers/passwordHelper')
 
@@ -40,9 +38,11 @@ class AuthRoutes extends BaseRoute {
                 }
             },
             handler: async (request) => {
-                console.log('authRoutes');
-                const {username, password} = request.payload
-    
+                const {
+                    username, 
+                    password
+                } = request.payload
+
                 const [usuario] = await this.db.read({
                     username: username.toLowerCase()
                 })
@@ -51,7 +51,7 @@ class AuthRoutes extends BaseRoute {
                     return Boom.unauthorized('O usuario informado não existe!')
                 }
 
-                const match = await PasswordHelper.comparePassword(password, usuario.password())
+                const match = await PasswordHelper.comparePassword(password, usuario.password)
 
                 if(!match) {
                     return Boom.unauthorized('Usuario ou senha invalidos')
@@ -68,7 +68,7 @@ class AuthRoutes extends BaseRoute {
 
                 return {
                     token
-                }    
+                }      
             }
         }
     }

@@ -1,9 +1,8 @@
 const BaseRoute = require('./base/baseRoute')
 const Joi = require('joi')
 const Boom = require('boom')
-
-// npm i jsonwebtoken
 const Jwt = require('jsonwebtoken')
+
 const failAction = (request, headers, error) => {
     throw error
 }
@@ -37,12 +36,15 @@ class AuthRoutes extends BaseRoute {
                 }
             },
             handler: async (request) => {
-                const {username, password} = request.payload
-                
-                if (username.toLowerCase() !== USER.username ||
-                    password !== USER.password
-                ) 
+                const {
+                    username, 
+                    password
+                } = request.payload
+
+                if (username.toLowerCase() !== USER.username || 
+                    password !== USER.password)
                     return Boom.unauthorized()
+
 
                 const token = Jwt.sign({
                     username: username,
@@ -51,7 +53,7 @@ class AuthRoutes extends BaseRoute {
 
                 return {
                     token
-                }    
+                }       
             }
         }
     }

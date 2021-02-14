@@ -19,12 +19,10 @@ class Postgres extends ICrud {
         }
     }
     static async defineModel(connection, schema) {
-        console.log("schema", schema);
         const model = connection.define(
             schema.name, schema.schema, schema.options
         ) 
         await model.sync()
-        console.log("AQUI!!!!!!!!!!");
         return model
     }
 

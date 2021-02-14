@@ -1,4 +1,4 @@
-const assert = require('assert') 
+const assert = require('assert')
 const api = require('../api')
 const Context = require('./../db/strategies/base/contextStrategy')
 const PostGres = require('./../db/strategies/postgres/postgres')
@@ -12,10 +12,10 @@ const USER = {
 
 const USER_DB = {
     username: USER.username.toLocaleLowerCase(),
-    password: '$$2a$04$tJM2geUTfLgl6rwfh6n6rOkiZa9XGB9npoICQj2l8XmkF8lVzibCO'
+    password: '$2a$04$4HYrgtfTj6jJRLbkglck8etrisGmLYxOF.fcYQxKnrHMWw2KHH84S'
 }
-describe.only('Auth test suite', function () {
-    this.timeout(5000);
+
+describe('Auth test suite', function () {
     this.beforeAll(async () => {
         app = await api
 
@@ -34,8 +34,24 @@ describe.only('Auth test suite', function () {
 
         const statusCode = result.statusCode
         const dados = JSON.parse(result.payload)
-        
         assert.deepEqual(statusCode, 200)
         assert.ok(dados.token.length > 10)
+    })
+
+    it('deve retornar não autorizado ao tentar obter um login errado', async () => {
+        const result = await app.inject({
+            method: 'POST',
+            url: '/login',
+            payload: {
+                username: 'andre',
+                password: '123'
+            }
+        })
+
+        const statusCode = result.statusCode
+        const dados = JSON.parse(result.payload)
+
+        assert.deepEqual(statusCode, 401)
+        assert.deepEqual(dados.error, "Unauthorized")
     })
 })

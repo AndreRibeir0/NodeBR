@@ -14,7 +14,7 @@ const MOCK_HEROI_INICIAL = {
 
 let MOCK_ID = ''
 
-describe.only('Suite de testes da API Heroes', function () {
+describe('Suite de testes da API Heroes', function () {
     this.beforeAll(async () => {
         app = await api
         const result = await app.inject({

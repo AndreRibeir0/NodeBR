@@ -1,6 +1,4 @@
 //npm install hapi
-// npm i vision inert hapi-swagger
-
 
 const Hapi = require('hapi')
 const Context = require('./db/strategies/base/contextStrategy')
@@ -13,13 +11,12 @@ const HapiSwagger = require('hapi-swagger')
 const Vision = require('vision')
 const Inert = require('inert')
 
-const swaggerConfig = {
+const swaggerOptions = {
     info: {
-        title: '#CursoNodeBR - API Herois',
+        title: 'API Herois - #CursoNodeBR',
         version: 'v1.0'
     },
     lang: 'pt'
-
 }
 
 const app = Hapi.Server({
@@ -33,18 +30,19 @@ function mapRoutes(instance, methods) {
 async function main() {
     const connection = MongoDb.connect()
     const context = new Context(new MongoDb(connection, HeroiSchema))
-
     
     await app.register([
         Vision,
         Inert,
         {
             plugin: HapiSwagger,
-            options: swaggerConfig
+            options: swaggerOptions
         }
-    ]) 
+    ])
 
-    app.route(mapRoutes(new HeroRoute(context), HeroRoute.methods()))
+    app.route([
+        ...mapRoutes(new HeroRoute(context), HeroRoute.methods())
+    ])
 
     await app.start()
     console.log('Servidor rodando na porta', app.info.port)

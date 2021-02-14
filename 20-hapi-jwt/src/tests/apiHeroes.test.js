@@ -1,8 +1,7 @@
 const assert = require('assert')
 const api = require('./../api')
 let app = {}
-
-const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ilh1eGFkYXNpbHZhIiwiaWQiOjEsImlhdCI6MTYxMzI0NzYzN30.yW0dNQeXcENIsaOpU6wu9OWOP69cJozHMmkrYEk2ICg'
+const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ilh1eGFkYXNpbHZhIiwiaWQiOjEsImlhdCI6MTYxMzMxODA5NH0.6LKCS89VLARfHrSa5DoQn8c_RPXYIL10789MzFAo3bw'
 
 const headers = {
     Authorization: TOKEN
@@ -20,7 +19,7 @@ const MOCK_HEROI_INICIAL = {
 
 let MOCK_ID = ''
 
-describe.only('Suite de testes da API Heroes', function () {
+describe('Suite de testes da API Heroes', function () {
     this.beforeAll(async () => {
         app = await api
         const result = await app.inject({

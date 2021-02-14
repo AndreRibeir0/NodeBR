@@ -1,14 +1,14 @@
 //npm install hapi
-// npm i vision inert hapi-swagger
+//npm i vision inert hapi-swagger
 //npm i hapi-auth-jwt2
-// npm i bcrypt
+// npm i bcryptjs
 
 const Hapi = require('hapi')
 const Context = require('./db/strategies/base/contextStrategy')
 const MongoDb = require('./db/strategies/mongodb/mongodb')
 const HeroiSchema = require('./db/strategies/mongodb/schemas/heroisSchema')
-const HeroRoutes = require('./routes/heroRoutes')
-const AuthRoutes = require('./routes/authRoutes')
+const HeroRoute = require('./routes/heroRoutes')
+const AuthRoute = require('./routes/authRoutes')
 
 const Postgres = require('./db/strategies/postgres/postgres')
 const UsuarioSchema = require('./db/strategies/postgres/schemas/usuarioSchema')
@@ -19,14 +19,12 @@ const Inert = require('inert')
 
 const HapiJwt = require('hapi-auth-jwt2')
 const JWT_SECRET = 'MEU_SEGREDO'
-
-const swaggerConfig = {
+const swaggerOptions = {
     info: {
-        title: '#CursoNodeBR - API Herois',
+        title: 'API Herois - #CursoNodeBR',
         version: 'v1.0'
     },
     lang: 'pt'
-
 }
 
 const app = Hapi.Server({
@@ -40,28 +38,39 @@ function mapRoutes(instance, methods) {
 async function main() {
     const connection = MongoDb.connect()
     const context = new Context(new MongoDb(connection, HeroiSchema))
-   
+
     const connectionPostgres = await Postgres.connect()
-    const usuarioSchema = await Postgres.defineModel(connectionPostgres, UsuarioSchema)
-    console.log('AQUI!!!');
-    const contextPostgres = new Context(new Postgres(connectionPostgres, usuarioSchema))
-    
+    const model = await Postgres.defineModel(connectionPostgres, UsuarioSchema)
+    const contextPostgres = new Context(new Postgres(connectionPostgres, model))
+
     await app.register([
         HapiJwt,
         Vision,
         Inert,
         {
             plugin: HapiSwagger,
-            options: swaggerConfig
+            options: swaggerOptions
         }
-    ]) 
-
+    ])
     app.auth.strategy('jwt', 'jwt', {
         key: JWT_SECRET,
         // options: {
-        //     expiresIn: 20
-        // },
-        validate: (dado, request) => {
+        //     expires: {
+        //         expiresIn: 20
+        //     },
+        // }
+        validate: async (dado, request) => {
+            
+            
+            const [result] = await contextPostgres.read({
+                username: dado.username.toLowerCase()
+            })
+
+            if (!result) {
+                return {
+                    isValid: false // caso nao valido false
+                }
+            }
             //verifica no banco se usuario continua ativo
 
             return {
@@ -70,10 +79,10 @@ async function main() {
         }
     })
     app.auth.default('jwt')
-    
+
     app.route([
-        ...mapRoutes(new HeroRoutes(context), HeroRoutes.methods()),
-        ...mapRoutes(new AuthRoutes(JWT_SECRET), contextPostgres, AuthRoutes.methods())
+        ...mapRoutes(new HeroRoute(context), HeroRoute.methods()),
+        ...mapRoutes(new AuthRoute(JWT_SECRET, contextPostgres), AuthRoute.methods())
     ])
 
     await app.start()

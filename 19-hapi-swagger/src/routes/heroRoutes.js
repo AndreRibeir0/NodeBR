@@ -159,6 +159,7 @@ class HeroRoutes extends BaseRoute{
                     const {id} = request.params
                     const result = await this._db.delete(id)
 
+                    console.log('result', result);
                     if(result.n !== 1) 
                         return Boom.preconditionFailed('Id não encontrado no banco!') 
 

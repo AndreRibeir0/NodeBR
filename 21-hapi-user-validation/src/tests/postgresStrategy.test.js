@@ -15,8 +15,7 @@ const MOCK_HEROI_ATUALIZAR = {
 
 let context = {}
 describe('Postgres Strategy', function () {
-    //this.timeout(Infinity)
-    this.timeout(4000)
+    this.timeout(Infinity)
     this.beforeAll(async function () {
         const connection = await Postgres.connect()
         const model = await Postgres.defineModel(connection, HeroiSchema)
